@@ -15,9 +15,9 @@ app.get('/', (req, res) => {
   res.send('Hello!')
 })
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`)
-})
+// app.listen(PORT, () => {
+//   console.log(`Example app listening on port ${PORT}`)
+// })
 
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase)
@@ -46,3 +46,17 @@ app.post('/urls', (req, res) => {
   console.log(req.body)
   res.send('ok')
 })
+
+// Functions
+function generateRandomString () {
+  let finalStr = ''
+  const possibleChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const length = 6
+
+  for (let i = 0; i < length; i++) {
+    let random = Math.floor(Math.random() * possibleChar.length)
+    finalStr += possibleChar.substring(random, random + 1)
+  }
+
+  return finalStr
+}
