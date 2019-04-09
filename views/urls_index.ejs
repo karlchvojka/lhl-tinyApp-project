@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, intial-scale=1, shrink-to-fit=no'>
+
+    <!-- bootstrap css -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <title>TinyApp</title>
+  </head>
+  <body style="font-size:20px; padding:50px;">
+    <!-- Add EJS code here -->
+    <h1>URL Shortener</h1>
+    <ul>
+    <% for(url in urls) { %>
+      <li><%= url %> <%= urls[url] %></li>
+    <% }; %>
+    </ul>
+    <a href="#">Shorten a new url</a>
+  </body>
+</html>
