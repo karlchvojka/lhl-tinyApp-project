@@ -1,12 +1,14 @@
-var express = require('express')
-var app = express()
-var PORT = 8080
+const express = require('express')
+const app = express()
+const bodyParser = require('body-parser')
+const PORT = 8080
 
 var urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
   '9sm5xk': 'http://www.google.com'
 }
 
+app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'ejs')
 
 app.get('/', (req, res) => {
