@@ -50,7 +50,9 @@ app.post('/urls', (req, res) => {
 })
 
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = req.body['longURL']
+  console.log('req: ', req)
+  const longURL = urlDatabase[req.params.shortURL]
+  console.log(longURL)
   res.redirect(longURL)
 })
 
