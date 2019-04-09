@@ -7,8 +7,10 @@ var urlDatabase = {
   '9sm5xk': 'http://www.google.com'
 }
 
+app.set('view engine', 'ejs')
+
 app.get('/', (req, res) => {
-  res.send('Hello!');
+  res.send('Hello!')
 })
 
 app.listen(PORT, () => {
