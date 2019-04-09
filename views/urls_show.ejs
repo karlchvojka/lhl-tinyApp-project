@@ -7,9 +7,12 @@
 
     <!-- bootstrap css -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <%- include partials/_header %>
+    <% include partials/_header %>
   </head>
-  <body style="font-size:20px; padding:50px;">
-    <!-- Add EJS code here -->
+  <body style="font-size:20px; padding:50px">
+    <h1>TinyApp</h1>
+    <a href="#">Create New TinyURL</a>
+    <h2>TinyURL for <%= longURL %></h2>
+    <p><%= shortURL %></p>
   </body>
 </html>

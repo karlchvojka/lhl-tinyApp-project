@@ -31,8 +31,7 @@ app.get('/urls', (req, res) => {
 })
 
 app.get('/urls/:shortURL', (req, res) => {
-  console.log(req.params)
   let shortURLRef = req.params.shortURL
-  let templateVars = { shortURL: shortURLRef, longURL: shortURLRef }
-  res.render('urls_show', templateVars)
+  let templateShowVars = { shortURL: shortURLRef, longURL: urlDatabase[shortURLRef] }
+  res.render('urls_show', templateShowVars)
 })
