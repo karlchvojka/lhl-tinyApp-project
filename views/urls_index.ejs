@@ -18,7 +18,9 @@
            <%= urls[url] %>
         </div>
         <div class="col-4" style="border:1px solid #ececec;padding:10px;">
-          <a href="/urls/<%= url %>/delete">Delete</a>
+          <form method="POST" action="/urls/<%= url %>/delete">
+            <input type="submit" value="Delete" />
+          </form>
         </div>
       </div>
       <% }; %>
@@ -31,8 +33,7 @@
       </div>
       <div class="row">
         <div class="col-12">
-          <form method="POST" action="/urls/9sm5xk/delete">
-          </form>
+
         </div>
       </div>
     </article>
