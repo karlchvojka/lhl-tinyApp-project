@@ -2,14 +2,21 @@
   <section>
     <article class="container">
       <div class="row">
-        <div class="col-12">
-      <h1>TinyApp</h1>
-      <a href="#">Create New TinyURL</a>
-      <h2>TinyURL for <%= longURL %></h2>
-      <p><%= shortURL %></p>
-      <a href="/urls">See All Urls</a>
+        <div class="col-6">
+          <h1>TinyApp</h1>
+          <a href="#">Create New TinyURL</a>
+          <h2>TinyURL for <%= longURL %></h2>
+          <p><%= shortURL %></p>
+          <a href="/urls">See All Urls</a>
+        </div>
+        <div class="col-6">
+          <h2>Update the url</h2>
+          <form method="POST" action="/urls/<%= shortURL %>/update">
+            <input class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em">
+            <input type="submit" value="Update" />
+          </form>
+        </div>
       </div>
     </article>
   </section>
-  </body>
-</html>
+<%- include partials/_footer %>

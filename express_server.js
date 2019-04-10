@@ -2,11 +2,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const PORT = 8080
-
-var urlDatabase = {
-  'b2xVn2': 'http://www.lighthouselabs.ca',
-  '9sm5xk': 'http://www.google.com'
-}
+var urlDatabase = require('./database')
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'ejs')
@@ -47,6 +43,11 @@ app.post('/urls', (req, res) => {
   urlDatabase[getShortURL] = req.body['longURL']
   console.log('database: ', urlDatabase)
   res.redirect('/urls/' + getShortURL)
+})
+
+app.post('/urls/:shortURL/update', (req, res) => {
+  urlDatabase[req.params.shortURL] = req.body['longURL']
+  console.log('database ', urlDatabase)
 })
 
 app.post('/urls/:shortURL/delete', (req, res) => {
