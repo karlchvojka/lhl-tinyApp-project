@@ -1,22 +1,40 @@
-<!DOCTYPE html>
-
-<html lang='en'>
-  <head>
-    <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width, intial-scale=1, shrink-to-fit=no'>
-
-    <!-- bootstrap css -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <%- include partials/_header %>
-  </head>
-  <body style="font-size:20px; padding:50px;">
+<%- include partials/_header %>
     <!-- Add EJS code here -->
-    <h1>URL Shortener</h1>
-    <ul>
-    <% for(url in urls) { %>
-      <li><%= url %> <%= urls[url] %></li>
-    <% }; %>
-    </ul>
-    <a href="#">Shorten a new url</a>
-  </body>
-</html>
+  <section>
+    <article class="container">
+      <div class="row">
+        <div class="col-12">
+          <h1>URL Shortener</h1>
+          <h3>Your URLs</h3>
+        </div>
+      </div>
+
+      <% for(url in urls) { %>
+      <div class="row" style="margin:10px 0px; border:1px solid #ececec;">
+        <div class="col-4" style="border:1px solid #ececec; padding:10px;">
+          <a href="/urls/<%= url %>"><%= url %></a>
+        </div>
+        <div class="col-4" style="border:1px solid #ececec; padding:10px; ">
+           <%= urls[url] %>
+        </div>
+        <div class="col-4" style="border:1px solid #ececec;padding:10px;">
+          <a href="/urls/<%= url %>/delete">Delete</a>
+        </div>
+      </div>
+      <% }; %>
+
+      <div class="row">
+        <div class="col-12">
+          <h3>Add a new URL:</h3>
+          <a href="/urls/new">Shorten a new url</a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <form method="POST" action="/urls/9sm5xk/delete">
+          </form>
+        </div>
+      </div>
+    </article>
+  </section>
+<%- include partials/_footer %>

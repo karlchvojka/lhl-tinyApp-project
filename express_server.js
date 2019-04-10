@@ -43,10 +43,16 @@ app.get('/urls/:shortURL', (req, res) => {
 })
 
 app.post('/urls', (req, res) => {
-  var getShortURL = String(generateRandomString())
+  var getShortURL = generateRandomString()
   urlDatabase[getShortURL] = req.body['longURL']
   console.log('database: ', urlDatabase)
   res.redirect('/urls/' + getShortURL)
+})
+
+app.get('/urls/:shortURL/delete', (req, res) => {
+  delete urlDatabase[req.params.shortURL]
+  console.log(urlDatabase)
+  res.redirect('/urls')
 })
 
 app.get('/u/:shortURL', (req, res) => {

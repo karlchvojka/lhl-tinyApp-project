@@ -1,18 +1,15 @@
-<!DOCTYPE html>
-
-<html lang='en'>
-  <head>
-    <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width, intial-scale=1, shrink-to-fit=no'>
-
-    <!-- bootstrap css -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <% include partials/_header %>
-  </head>
-  <body style="font-size:20px; padding:50px">
-    <h1>TinyApp</h1>
-    <a href="#">Create New TinyURL</a>
-    <h2>TinyURL for <%= longURL %></h2>
-    <p><%= shortURL %></p>
+<% include partials/_header %>
+  <section>
+    <article class="container">
+      <div class="row">
+        <div class="col-12">
+      <h1>TinyApp</h1>
+      <a href="#">Create New TinyURL</a>
+      <h2>TinyURL for <%= longURL %></h2>
+      <p><%= shortURL %></p>
+      <a href="/urls">See All Urls</a>
+      </div>
+    </article>
+  </section>
   </body>
 </html>
