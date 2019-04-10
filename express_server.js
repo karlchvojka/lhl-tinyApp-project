@@ -1,28 +1,41 @@
+// Include modules
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
-const PORT = 8080
-var urlDatabase = require('./database')
 
+// Set Port
+const PORT = 8080
+
+// Include Databases
+var urlDatabase = require('./database')
+var usersDatabase = {
+  'userRandomID': {
+    id: 'userRandomID',
+    email: 'user@example.com',
+    password: 'purple-monkey-dinosaur'
+  },
+  'user2RandomID': {
+    id: 'user2RandomID',
+    email: 'user2@example.com',
+    password: 'dishwasher-funk'
+  }
+}
+
+// Set a couple things for the app
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'ejs')
 app.use(cookieParser())
 
-var users = {}
-
 app.get('/', (req, res) => {
   res.send('Hello!')
-  console.log('Cookies: ', req.cookies)
-
-  // Cookies that have been signed
-  console.log('Signed Cookies: ', req.signedCookies)
 })
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`)
 })
 
+// Make the Database readable via a webpage.
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase)
 })
@@ -32,16 +45,16 @@ app.get('/hello', (req, res) => {
 })
 
 app.get('/urls', (req, res) => {
-  let templateVars = { urls: urlDatabase, username: req.cookies['username'] }
+  let templateVars = { urls: urlDatabase, user: usersDatabase[req.cookies['user_id']] }
   res.render('urls_index', templateVars)
 })
 app.get('/register', (req, res) => {
-  let templateVars = { urls: urlDatabase, username: req.cookies['username'] }
+  let templateVars = { urls: urlDatabase, user: usersDatabase[req.cookies['user_id']] }
   res.render('registration', templateVars)
 })
 
 app.get('/urls/new', (req, res) => {
-  let templateVars = { username: req.cookies['username'] }
+  let templateVars = { user: usersDatabase[req.cookies['user_id']] }
   res.render('urls_new', templateVars)
 })
 
@@ -60,7 +73,10 @@ app.post('/urls', (req, res) => {
 
 app.post('/login', (req, res) => {
   console.log(req.body)
-  res.cookie('username', req.body.username)
+  let usernameEntry = req.body.username
+  let keyEntry = lookupByEmail(usernameEntry)
+
+  res.cookie('user_id', keyEntry)
   res.redirect('/urls/')
 })
 
@@ -70,18 +86,29 @@ app.post('/logout', (req, res) => {
 })
 
 app.post('/register', (req, res) => {
-  console.log('body', req.body)
+  // Set variables From the response.
+  let regVars = usersDatabase
   var usernameEntry = req.body['email']
   var passwordEntry = req.body['password']
-  var iD = generateRandomString()
-  let regVars = users
+  var randomiD = generateRandomString()
+  const errorCall = (errorCode) => { res.sendStatus(errorCode) }
 
-  regVars[iD] = {}
-  regVars[iD]['email'] = usernameEntry
-  regVars[iD]['password'] = passwordEntry
-
-  console.log('database: ', regVars)
-  res.redirect('/urls')
+  // IF either filed is emtpy return 400.
+  if (usernameEntry === '' || passwordEntry === '') {
+    errorCall(404)
+  }
+  for (user in usersDatabase) {
+    if (usersDatabase[user]['email'] === usernameEntry) {
+      return errorCall(400)
+    }
+  }
+  // Else add info to database.
+  regVars[randomiD] = {}
+  regVars[randomiD]['id'] = randomiD
+  regVars[randomiD]['email'] = usernameEntry
+  regVars[randomiD]['password'] = passwordEntry
+  console.log(regVars)
+  res.redirect('/register') // TODO: CHANGE BACK TO /urls
 })
 
 app.post('/urls/:shortURL/update', (req, res) => {
@@ -114,4 +141,14 @@ function generateRandomString () {
   }
 
   return finalStr
+}
+
+function lookupByEmail (inputUserEntry) {
+  var responseID = ''
+  Object.keys(usersDatabase).forEach(function (key) {
+    if (usersDatabase[key]['email'] === inputUserEntry) {
+      responseID = usersDatabase[key]['id']
+    }
+  })
+  return responseID
 }

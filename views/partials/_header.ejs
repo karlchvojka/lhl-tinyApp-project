@@ -25,9 +25,9 @@
             <a class="nav-link" href="/urls/new">Add URL</a>
           </li>
         </ul>
-        <% if ( username ) { %>
+        <% if ( user ) { %>
           <span class="navbar-text" style="margin-right:10px;">
-            <%= username %>
+            <%= user.email %>
           </span>
 
           <form class="form-inline my-2 my-lg-0" action="/logout" method="POST">
