@@ -19,6 +19,11 @@ var usersDatabase = {
     id: 'user2RandomID',
     email: 'user2@example.com',
     password: 'dishwasher-funk'
+  },
+  'karlsRandoKey': {
+    id: 'karlsRandoKey',
+    email: 'karl.chvojka@gmail.com',
+    password: 'stuff'
   }
 }
 
@@ -53,6 +58,11 @@ app.get('/register', (req, res) => {
   res.render('registration', templateVars)
 })
 
+app.get('/login', (req, res) => {
+  let templateVars = { urls: urlDatabase, user: usersDatabase[req.cookies['user_id']] }
+  res.render('login', templateVars)
+})
+
 app.get('/urls/new', (req, res) => {
   let templateVars = { user: usersDatabase[req.cookies['user_id']] }
   res.render('urls_new', templateVars)
@@ -60,7 +70,7 @@ app.get('/urls/new', (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
   let shortURLRef = req.params.shortURL
-  let templateShowVars = { shortURL: shortURLRef, longURL: urlDatabase[shortURLRef], username: req.cookies['username'] }
+  let templateShowVars = { shortURL: shortURLRef, longURL: urlDatabase[shortURLRef], user: usersDatabase[req.cookies['user_id']] }
   res.render('urls_show', templateShowVars)
 })
 
@@ -72,16 +82,26 @@ app.post('/urls', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
-  console.log(req.body)
-  let usernameEntry = req.body.username
-  let keyEntry = lookupByEmail(usernameEntry)
+  let emailEntry = req.body.email
+  let passwordEntry = req.body.password
+  let keyEntry = lookupByEmail(emailEntry)
+  const errorCall = (errorCode) => { res.sendStatus(errorCode) }
 
-  res.cookie('user_id', keyEntry)
-  res.redirect('/urls/')
+  console.log('keyEntry', keyEntry)
+  console.log('users', usersDatabase)
+
+  if (keyEntry === undefined) {
+    errorCall(403)
+  } else if (keyEntry && passwordEntry !== usersDatabase[keyEntry]['password']) {
+    errorCall(403)
+  } else {
+    res.cookie('user_id', keyEntry)
+    res.redirect('/urls/')
+  }
 })
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username')
+  res.clearCookie('user_id')
   res.redirect('/urls')
 })
 
@@ -102,13 +122,13 @@ app.post('/register', (req, res) => {
       return errorCall(400)
     }
   }
-  // Else add info to database.
+  // Else add info to database
   regVars[randomiD] = {}
   regVars[randomiD]['id'] = randomiD
   regVars[randomiD]['email'] = usernameEntry
   regVars[randomiD]['password'] = passwordEntry
   console.log(regVars)
-  res.redirect('/register') // TODO: CHANGE BACK TO /urls
+  res.redirect('/urls') // TODO: CHANGE BACK TO /urls
 })
 
 app.post('/urls/:shortURL/update', (req, res) => {
@@ -148,6 +168,8 @@ function lookupByEmail (inputUserEntry) {
   Object.keys(usersDatabase).forEach(function (key) {
     if (usersDatabase[key]['email'] === inputUserEntry) {
       responseID = usersDatabase[key]['id']
+    } else {
+      responseID = undefined
     }
   })
   return responseID
