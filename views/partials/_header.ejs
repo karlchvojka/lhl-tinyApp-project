@@ -12,7 +12,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <a class="navbar-brand" href="#">Tiny App</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+        <span class="navbar-toggler -icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -24,6 +24,18 @@
             <a class="nav-link" href="/urls/new">Add URL</a>
           </li>
         </ul>
-         <button id="login" class="btn btn-sm btn-primary" type="button">Login</button>&nbsp;
-         <button id="register" class="btn btn-sm btn-primary" type="button">Register</button>
+        <% if ( username ) { %>
+          <span class="navbar-text" style="margin-right:10px;">
+            <%= username %>
+          </span>
+
+          <form class="form-inline my-2 my-lg-0" action="/logout" method="POST">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
+          </form>
+         <% } else{ %>
+           <form class="form-inline my-2 my-lg-0" action="/login" method="POST">
+            <input class="form-control mr-sm-2" type="text" placeholder="Login" name="username">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
+          </form>
+        <% } %>
     </nav>

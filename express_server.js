@@ -1,14 +1,20 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
 const PORT = 8080
 var urlDatabase = require('./database')
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'ejs')
+app.use(cookieParser())
 
 app.get('/', (req, res) => {
   res.send('Hello!')
+  console.log('Cookies: ', req.cookies)
+
+  // Cookies that have been signed
+  console.log('Signed Cookies: ', req.signedCookies)
 })
 
 app.listen(PORT, () => {
@@ -24,17 +30,18 @@ app.get('/hello', (req, res) => {
 })
 
 app.get('/urls', (req, res) => {
-  let templateVars = { urls: urlDatabase }
+  let templateVars = { urls: urlDatabase, username: req.cookies['username'] }
   res.render('urls_index', templateVars)
 })
 
 app.get('/urls/new', (req, res) => {
-  res.render('urls_new')
+  let templateVars = { username: req.cookies['username'] }
+  res.render('urls_new', templateVars)
 })
 
 app.get('/urls/:shortURL', (req, res) => {
   let shortURLRef = req.params.shortURL
-  let templateShowVars = { shortURL: shortURLRef, longURL: urlDatabase[shortURLRef] }
+  let templateShowVars = { shortURL: shortURLRef, longURL: urlDatabase[shortURLRef], username: req.cookies['username'] }
   res.render('urls_show', templateShowVars)
 })
 
@@ -43,6 +50,17 @@ app.post('/urls', (req, res) => {
   urlDatabase[getShortURL] = req.body['longURL']
   console.log('database: ', urlDatabase)
   res.redirect('/urls/' + getShortURL)
+})
+
+app.post('/login', (req, res) => {
+  console.log(req.body)
+  res.cookie('username', req.body.username)
+  res.redirect('/urls/')
+})
+
+app.post('/logout', (req, res) => {
+  res.clearCookie('username')
+  res.redirect('/urls')
 })
 
 app.post('/urls/:shortURL/update', (req, res) => {
