@@ -1,0 +1,32 @@
+<% include partials/_header %>
+  <section>
+    <article class="container">
+      <div class="row">
+        <div class="col-12">
+          <h1>Register for the Tiny App URL shortner</h1>
+          <h3>Benifits of registering:</h3>
+          <ul>
+            <li>Keep track of your links</li>
+            <li>Add, delete, edit unlimited URLS!</li>
+          </ul>
+          <form method="POST" action="/register">
+            <div class="row">
+                <div class="col-3">
+                <label>Username
+                <input class="form-control" type="email" name="email" placeholder="yourname@email.com">
+                </label>
+              </div>
+              <div class="col-3">
+                <label>Password
+                <input class="form-control" type="password" name="password" >
+                </label>
+              </div>
+              <div class="col-12">
+                <input type="submit" value="Register" />
+              </div>
+            </div>
+          </form>
+        </div>
+    </article>
+  </section>
+<%- include partials/_footer %>

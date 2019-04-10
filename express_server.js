@@ -9,6 +9,8 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'ejs')
 app.use(cookieParser())
 
+var users = {}
+
 app.get('/', (req, res) => {
   res.send('Hello!')
   console.log('Cookies: ', req.cookies)
@@ -32,6 +34,10 @@ app.get('/hello', (req, res) => {
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase, username: req.cookies['username'] }
   res.render('urls_index', templateVars)
+})
+app.get('/register', (req, res) => {
+  let templateVars = { urls: urlDatabase, username: req.cookies['username'] }
+  res.render('registration', templateVars)
 })
 
 app.get('/urls/new', (req, res) => {
@@ -60,6 +66,21 @@ app.post('/login', (req, res) => {
 
 app.post('/logout', (req, res) => {
   res.clearCookie('username')
+  res.redirect('/urls')
+})
+
+app.post('/register', (req, res) => {
+  console.log('body', req.body)
+  var usernameEntry = req.body['email']
+  var passwordEntry = req.body['password']
+  var iD = generateRandomString()
+  let regVars = users
+
+  regVars[iD] = {}
+  regVars[iD]['email'] = usernameEntry
+  regVars[iD]['password'] = passwordEntry
+
+  console.log('database: ', regVars)
   res.redirect('/urls')
 })
 
