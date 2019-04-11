@@ -51,6 +51,7 @@ app.get('/hello', (req, res) => {
 
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase, user: usersDatabase[req.cookies['user_id']] }
+  console.log('vars', templateVars)
   res.render('urls_index', templateVars)
 })
 app.get('/register', (req, res) => {
@@ -65,18 +66,26 @@ app.get('/login', (req, res) => {
 
 app.get('/urls/new', (req, res) => {
   let templateVars = { user: usersDatabase[req.cookies['user_id']] }
-  res.render('urls_new', templateVars)
+  if (!req.cookies['user_id']) {
+    res.redirect('/login')
+  } else {
+    res.render('urls_new', templateVars)
+  }
 })
 
 app.get('/urls/:shortURL', (req, res) => {
   let shortURLRef = req.params.shortURL
+  console.log('req', req.params)
   let templateShowVars = { shortURL: shortURLRef, longURL: urlDatabase[shortURLRef], user: usersDatabase[req.cookies['user_id']] }
+  console.log('vars', templateShowVars)
   res.render('urls_show', templateShowVars)
 })
 
 app.post('/urls', (req, res) => {
   var getShortURL = generateRandomString()
-  urlDatabase[getShortURL] = req.body['longURL']
+  urlDatabase[getShortURL] = {}
+  urlDatabase[getShortURL]['longURL'] = req.body['longURL']
+  urlDatabase[getShortURL]['userID'] = req.cookies.user_id
   console.log('database: ', urlDatabase)
   res.redirect('/urls/' + getShortURL)
 })
@@ -86,9 +95,6 @@ app.post('/login', (req, res) => {
   let passwordEntry = req.body.password
   let keyEntry = lookupByEmail(emailEntry)
   const errorCall = (errorCode) => { res.sendStatus(errorCode) }
-
-  console.log('keyEntry', keyEntry)
-  console.log('users', usersDatabase)
 
   if (keyEntry === undefined) {
     errorCall(403)

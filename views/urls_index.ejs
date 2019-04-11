@@ -8,21 +8,25 @@
           <h3>Your URLs</h3>
         </div>
       </div>
-
       <% for(url in urls) { %>
-      <div class="row" style="margin:10px 0px; border:1px solid #ececec;">
-        <div class="col-4" style="border:1px solid #ececec; padding:10px;">
-          <a href="/urls/<%= url %>">Edit</a>
-        </div>
-        <div class="col-4" style="border:1px solid #ececec; padding:10px; ">
-           <%= urls[url] %>
-        </div>
-        <div class="col-4" style="border:1px solid #ececec;padding:10px;">
-          <form method="POST" action="/urls/<%= url %>/delete">
-            <input type="submit" value="Delete" />
-          </form>
-        </div>
-      </div>
+        <% if(urls[url]['userID'] === user['id']) {%>
+
+          <div class="row" style="margin:10px 0px; border:1px solid #ececec;">
+            <div class="col-4" style="border:1px solid #ececec; padding:10px;">
+              <a href="/urls/<%= urls['url'] %>">Edit</a>
+            </div>
+            <div class="col-4" style="border:1px solid #ececec; padding:10px; ">
+               <%= urls %>
+            </div>
+            <div class="col-4" style="border:1px solid #ececec;padding:10px;">
+              <form method="POST" action="/urls/<%= url %>/delete">
+                <input type="submit" value="Delete" />
+              </form>
+            </div>
+          </div>
+        <% } %>
+
+
       <% }; %>
 
       <div class="row">
