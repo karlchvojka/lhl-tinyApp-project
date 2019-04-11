@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
+const bcrypt = require('bcrypt')
 
 // Set Port
 const PORT = 8080
@@ -19,12 +20,12 @@ var usersDatabase = {
     id: 'user2RandomID',
     email: 'user2@example.com',
     password: 'dishwasher-funk'
-  },
-  'karlsRandoKey': {
-    id: 'karlsRandoKey',
-    email: 'karl.chvojka@gmail.com',
-    password: 'stuff'
-  }
+  } // WHEN YOU UNCOMMENT BELOW REMEMBER TO ADD COMMA
+  // 'karlsRandoKey': {
+  //   id: 'karlsRandoKey',
+  //   email: 'karl.chvojka@gmail.com',
+  //   password: 'stuff'
+  // }
 }
 
 // Set a couple things for the app
@@ -105,11 +106,11 @@ app.post('/login', (req, res) => {
 
   if (keyEntry === undefined) {
     errorCall(403)
-  } else if (keyEntry && passwordEntry !== usersDatabase[keyEntry]['password']) {
-    errorCall(403)
-  } else {
+  } else if (keyEntry && bcrypt.compareSync(passwordEntry, usersDatabase[keyEntry]['password'])) {
     res.cookie('user_id', keyEntry)
     res.redirect('/urls/')
+  } else {
+    errorCall(403)
   }
 })
 
@@ -121,13 +122,14 @@ app.post('/logout', (req, res) => {
 app.post('/register', (req, res) => {
   // Set variables From the response.
   let regVars = usersDatabase
-  var usernameEntry = req.body['email']
-  var passwordEntry = req.body['password']
+  const usernameEntry = req.body['email']
+  const passwordEntry = req.body['password']
+  const hashedPassword = bcrypt.hashSync(passwordEntry, 10)
   var randomiD = generateRandomString()
   const errorCall = (errorCode) => { res.sendStatus(errorCode) }
 
   // IF either filed is emtpy return 400.
-  if (usernameEntry === '' || passwordEntry === '') {
+  if (usernameEntry === '' || hashedPassword === '') {
     errorCall(404)
   }
   for (user in usersDatabase) {
@@ -139,7 +141,7 @@ app.post('/register', (req, res) => {
   regVars[randomiD] = {}
   regVars[randomiD]['id'] = randomiD
   regVars[randomiD]['email'] = usernameEntry
-  regVars[randomiD]['password'] = passwordEntry
+  regVars[randomiD]['password'] = hashedPassword
   console.log(regVars)
   res.redirect('/urls') // TODO: CHANGE BACK TO /urls
 })

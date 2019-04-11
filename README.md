@@ -28,6 +28,7 @@ npm install
 ## Changelog
 ### Apr 11, 2019
 - Did the beginning work on the Project
+- Installed bcrypt
 
 ## Authors
 - Karl Chvojka
