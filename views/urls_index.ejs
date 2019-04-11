@@ -9,14 +9,14 @@
         </div>
       </div>
       <% for(url in urls) { %>
-        <% if(urls[url]['userID'] === user['id']) {%>
+        <% if(user && urls[url]['userID'] === user['id']) {%>
 
           <div class="row" style="margin:10px 0px; border:1px solid #ececec;">
             <div class="col-4" style="border:1px solid #ececec; padding:10px;">
-              <a href="/urls/<%= urls['url'] %>">Edit</a>
+              <a href="/urls/<%= `${url}` %>">Edit</a>
             </div>
             <div class="col-4" style="border:1px solid #ececec; padding:10px; ">
-               <%= urls %>
+               <%= urls[url]['longURL'] %>
             </div>
             <div class="col-4" style="border:1px solid #ececec;padding:10px;">
               <form method="POST" action="/urls/<%= url %>/delete">
@@ -24,7 +24,7 @@
               </form>
             </div>
           </div>
-        <% } %>
+        <% }  %>
 
 
       <% }; %>

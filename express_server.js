@@ -51,9 +51,13 @@ app.get('/hello', (req, res) => {
 
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase, user: usersDatabase[req.cookies['user_id']] }
-  console.log('vars', templateVars)
-  res.render('urls_index', templateVars)
+  if (templateVars.user) {
+    res.render('urls_index', templateVars)
+  } else {
+    res.redirect('/login')
+  }
 })
+
 app.get('/register', (req, res) => {
   let templateVars = { urls: urlDatabase, user: usersDatabase[req.cookies['user_id']] }
   res.render('registration', templateVars)
@@ -74,9 +78,12 @@ app.get('/urls/new', (req, res) => {
 })
 
 app.get('/urls/:shortURL', (req, res) => {
+  console.log('/urls/:shortURL =================================')
+  console.log('params: ', req.params)
+  console.log('urlDatabase', urlDatabase)
   let shortURLRef = req.params.shortURL
-  console.log('req', req.params)
-  let templateShowVars = { shortURL: shortURLRef, longURL: urlDatabase[shortURLRef], user: usersDatabase[req.cookies['user_id']] }
+  console.log('long url', urlDatabase[shortURLRef].longURL)
+  let templateShowVars = { shortURL: shortURLRef, longURL: urlDatabase[shortURLRef].longURL, user: usersDatabase[req.cookies['user_id']] }
   console.log('vars', templateShowVars)
   res.render('urls_show', templateShowVars)
 })
@@ -138,8 +145,12 @@ app.post('/register', (req, res) => {
 })
 
 app.post('/urls/:shortURL/update', (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body['longURL']
-  console.log('database ', urlDatabase)
+  console.log('/urls/:shortURL/update[ ==========================]')
+  console.log(urlDatabase[req.params.shortURL])
+  let shortURLRef = req.params.shortURL
+  urlDatabase[req.params.shortURL]['userID'] = req.cookies.user_id
+  urlDatabase[shortURLRef]['longURL'] = req.body['longURL']
+  res.redirect('/urls/' + req.params.shortURL)
 })
 
 app.post('/urls/:shortURL/delete', (req, res) => {
@@ -150,7 +161,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 app.get('/u/:shortURL', (req, res) => {
   console.log('req: ', req)
-  const longURL = urlDatabase[req.params.shortURL]
+  const longURL = urlDatabase[req.params.shortURL]['longURL']
   console.log(longURL)
   res.redirect(longURL)
 })
