@@ -1,7 +1,7 @@
 # Karls TinyApp Project
 
-["Screenshot of URLs page"](https://github.com/karlchvojka/lhl-tinyApp-project/blob/master/docs/tinyapp1.png?raw=true)
-["Screenshot of New Page"](https://github.com/karlchvojka/lhl-tinyApp-project/blob/master/docs/tinyapp2.png?raw=true)
+!["Screenshot of URLs page"](https://github.com/karlchvojka/lhl-tinyApp-project/blob/master/docs/tinyapp1.png?raw=true)
+!["Screenshot of New Page"](https://github.com/karlchvojka/lhl-tinyApp-project/blob/master/docs/tinyapp2.png?raw=true)
 ## Getting Started
 ### Prerequisites
 - NODEJS (v8.10.0)
