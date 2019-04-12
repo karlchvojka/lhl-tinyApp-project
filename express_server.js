@@ -12,13 +12,12 @@ const PORT = 8080
 var urlDatabase = require('./database')
 var usersDatabase = require('./users')
 
-// Set a couple things for the app
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'ejs')
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2'],
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  maxAge: 24 * 60 * 60 * 1000
 }))
 
 app.listen(PORT, () => {
@@ -38,7 +37,6 @@ app.get('/urls', (req, res) => {
   if (templateVars.user) {
     res.render('urls_index', templateVars)
   } else {
-    // WORKS //
     res.send('Please log in <a href="/login"> here</a>')
   }
 })
@@ -66,13 +64,11 @@ app.get('/urls/new', (req, res) => {
   if (!req.session['user_id']) {
     res.redirect('/login')
   } else {
-    // Works //
     res.render('urls_new', templateVars)
   }
 })
 
 app.get('/urls/:shortURL', (req, res) => {
-  // IF USER IS SIGNED IN
   if (!req.session['user_id'] || !usersDatabase[req.session['user_id']]) {
     res.send('Please sign in <a href="/login">here</a>')
     return
@@ -123,7 +119,6 @@ app.post('/logout', (req, res) => {
 })
 
 app.post('/register', (req, res) => {
-  // Set variables From the response.
   let regVars = usersDatabase
   const usernameEntry = req.body['email']
   const passwordEntry = req.body['password']
@@ -159,7 +154,6 @@ app.post('/register', (req, res) => {
 app.post('/urls/:shortURL/update', (req, res) => {
   let shortURLRef = req.params.shortURL
   urlDatabase[shortURLRef].longURL = req.body.longURL
-  console.log('body', req.body)
   res.redirect('/urls/')
 })
 
@@ -168,7 +162,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.redirect('/urls')
 })
 
-// ------- WORKS -----------//
 app.get('/u/:shortURL', (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     const longURL = urlDatabase[req.params.shortURL]['longURL']
@@ -177,9 +170,7 @@ app.get('/u/:shortURL', (req, res) => {
     res.send('That url has not been shortened with this service')
   }
 })
-// -------- END -----------//
 
-// Functions
 function generateRandomString () {
   let finalStr = ''
   const possibleChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'

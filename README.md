@@ -17,6 +17,12 @@ Then run the following demand to install the package dependencies listed in the 
 npm install
 ```
 
+### Starting
+To start the program run the following command from the main folder (That includes package.json):
+```
+npm start
+```
+
 ## Package dependencies
 - [body parser][https://www.npmjs.com/package/body-parser]
 - [Cookie parser][https://www.npmjs.com/package/cookie-parser]
