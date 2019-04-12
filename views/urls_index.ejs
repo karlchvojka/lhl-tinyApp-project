@@ -8,15 +8,32 @@
           <h3>Your URLs</h3>
         </div>
       </div>
+      <div class="row" style="margin-bottom:10px">
+        <div class="col-2" style="border:1px solid #ececec;">
+          <p>Short Url:</p>
+        </div>
+        <div class="col-4" style="border:1px solid #ececec;">
+          <p>Long Url:</p>
+        </div>
+        <div class="col-2" style="border:1px solid #ececec;">
+          <p>Edit:</p>
+        </div>
+        <div class="col-4" style="border:1px solid #ececec;">
+          <p>Delete:</p>
+        </div>
+      </div>
       <% for(url in urls) { %>
         <% if(user && urls[url]['userID'] === user['id']) {%>
 
-          <div class="row" style="margin:10px 0px; border:1px solid #ececec;">
-            <div class="col-4" style="border:1px solid #ececec; padding:10px;">
-              <a href="/urls/<%= `${url}` %>">Edit</a>
+          <div class="row">
+            <div class="col-2" style="border:1px solid #ececec; padding:10px;"">
+              <p><%= url %></p>
             </div>
             <div class="col-4" style="border:1px solid #ececec; padding:10px; ">
                <%= urls[url]['longURL'] %>
+            </div>
+            <div class="col-2" style="border:1px solid #ececec; padding:10px;"">
+              <a style="display:inline-block;" href="/urls/<%= `${url}` %>">Edit</a>
             </div>
             <div class="col-4" style="border:1px solid #ececec;padding:10px;">
               <form method="POST" action="/urls/<%= url %>/delete">
@@ -29,7 +46,7 @@
 
       <% }; %>
 
-      <div class="row">
+      <div class="row" style="margin-top:50px;">
         <div class="col-12">
           <h3>Add a new URL:</h3>
           <a href="/urls/new">Shorten a new url</a>

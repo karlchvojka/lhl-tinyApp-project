@@ -2,7 +2,7 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
-const cookieParser = require('cookie-parser')
+const cookieSession = require('cookie-session')
 const bcrypt = require('bcrypt')
 
 // Set Port
@@ -10,31 +10,23 @@ const PORT = 8080
 
 // Include Databases
 var urlDatabase = require('./database')
-var usersDatabase = {
-  'userRandomID': {
-    id: 'userRandomID',
-    email: 'user@example.com',
-    password: 'purple-monkey-dinosaur'
-  },
-  'user2RandomID': {
-    id: 'user2RandomID',
-    email: 'user2@example.com',
-    password: 'dishwasher-funk'
-  } // WHEN YOU UNCOMMENT BELOW REMEMBER TO ADD COMMA
-  // 'karlsRandoKey': {
-  //   id: 'karlsRandoKey',
-  //   email: 'karl.chvojka@gmail.com',
-  //   password: 'stuff'
-  // }
-}
+var usersDatabase = require('./users')
 
 // Set a couple things for the app
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'ejs')
-app.use(cookieParser())
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2'],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 app.get('/', (req, res) => {
-  res.send('Hello!')
+  if (req.session['user_id']) {
+    res.redirect('/urls')
+  } else {
+    res.redirect('/login')
+  }
 })
 
 app.listen(PORT, () => {
@@ -51,7 +43,7 @@ app.get('/hello', (req, res) => {
 })
 
 app.get('/urls', (req, res) => {
-  let templateVars = { urls: urlDatabase, user: usersDatabase[req.cookies['user_id']] }
+  let templateVars = { urls: urlDatabase, user: usersDatabase[req.session['user_id']] }
   if (templateVars.user) {
     res.render('urls_index', templateVars)
   } else {
@@ -60,18 +52,22 @@ app.get('/urls', (req, res) => {
 })
 
 app.get('/register', (req, res) => {
-  let templateVars = { urls: urlDatabase, user: usersDatabase[req.cookies['user_id']] }
-  res.render('registration', templateVars)
+  if (!req.session['user_id']) {
+    let templateVars = { urls: urlDatabase, user: usersDatabase[req.session['user_id']] }
+    res.render('registration', templateVars)
+  } else {
+    res.redirect('/urls')
+  }
 })
 
 app.get('/login', (req, res) => {
-  let templateVars = { urls: urlDatabase, user: usersDatabase[req.cookies['user_id']] }
+  let templateVars = { urls: urlDatabase, user: usersDatabase[req.session['user_id']] }
   res.render('login', templateVars)
 })
 
 app.get('/urls/new', (req, res) => {
-  let templateVars = { user: usersDatabase[req.cookies['user_id']] }
-  if (!req.cookies['user_id']) {
+  let templateVars = { user: usersDatabase[req.session['user_id']] }
+  if (!req.session['user_id']) {
     res.redirect('/login')
   } else {
     res.render('urls_new', templateVars)
@@ -79,13 +75,10 @@ app.get('/urls/new', (req, res) => {
 })
 
 app.get('/urls/:shortURL', (req, res) => {
-  console.log('/urls/:shortURL =================================')
-  console.log('params: ', req.params)
-  console.log('urlDatabase', urlDatabase)
   let shortURLRef = req.params.shortURL
-  console.log('long url', urlDatabase[shortURLRef].longURL)
-  let templateShowVars = { shortURL: shortURLRef, longURL: urlDatabase[shortURLRef].longURL, user: usersDatabase[req.cookies['user_id']] }
-  console.log('vars', templateShowVars)
+  console.log('short', shortURLRef)
+  console.log('params', urlDatabase)
+  let templateShowVars = { shortURL: shortURLRef, longURL: urlDatabase[shortURLRef].longURL, user: usersDatabase[req.session['user_id']] }
   res.render('urls_show', templateShowVars)
 })
 
@@ -93,8 +86,7 @@ app.post('/urls', (req, res) => {
   var getShortURL = generateRandomString()
   urlDatabase[getShortURL] = {}
   urlDatabase[getShortURL]['longURL'] = req.body['longURL']
-  urlDatabase[getShortURL]['userID'] = req.cookies.user_id
-  console.log('database: ', urlDatabase)
+  urlDatabase[getShortURL]['userID'] = req.session.user_id
   res.redirect('/urls/' + getShortURL)
 })
 
@@ -102,20 +94,21 @@ app.post('/login', (req, res) => {
   let emailEntry = req.body.email
   let passwordEntry = req.body.password
   let keyEntry = lookupByEmail(emailEntry)
-  const errorCall = (errorCode) => { res.sendStatus(errorCode) }
-
+  // const errorCall = (errorCode) => { res.sendStatus(errorCode) }
   if (keyEntry === undefined) {
-    errorCall(403)
+    // errorCall(403)
+    res.send('Your user does not exist. Please try again.')
   } else if (keyEntry && bcrypt.compareSync(passwordEntry, usersDatabase[keyEntry]['password'])) {
-    res.cookie('user_id', keyEntry)
+    req.session['user_id'] = keyEntry
     res.redirect('/urls/')
   } else {
-    errorCall(403)
+    // errorCall(403)
+    res.send('Your Please try again.')
   }
 })
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id')
+  req.session = null
   res.redirect('/urls')
 })
 
@@ -142,30 +135,28 @@ app.post('/register', (req, res) => {
   regVars[randomiD]['id'] = randomiD
   regVars[randomiD]['email'] = usernameEntry
   regVars[randomiD]['password'] = hashedPassword
-  console.log(regVars)
-  res.redirect('/urls') // TODO: CHANGE BACK TO /urls
+  res.redirect('/urls')
 })
 
 app.post('/urls/:shortURL/update', (req, res) => {
-  console.log('/urls/:shortURL/update[ ==========================]')
-  console.log(urlDatabase[req.params.shortURL])
   let shortURLRef = req.params.shortURL
-  urlDatabase[req.params.shortURL]['userID'] = req.cookies.user_id
-  urlDatabase[shortURLRef]['longURL'] = req.body['longURL']
-  res.redirect('/urls/' + req.params.shortURL)
+  urlDatabase[shortURLRef].longURL = req.body.longURL
+  console.log('body', req.body)
+  res.redirect('/urls/')
 })
 
 app.post('/urls/:shortURL/delete', (req, res) => {
   delete urlDatabase[req.params.shortURL]
-  console.log(urlDatabase)
   res.redirect('/urls')
 })
 
 app.get('/u/:shortURL', (req, res) => {
-  console.log('req: ', req)
-  const longURL = urlDatabase[req.params.shortURL]['longURL']
-  console.log(longURL)
-  res.redirect(longURL)
+  if (urlDatabase[req.params.shortURL]) {
+    const longURL = urlDatabase[req.params.shortURL]['longURL']
+    res.redirect(longURL)
+  } else {
+    res.send('That url has not been shortened with this service')
+  }
 })
 
 // Functions

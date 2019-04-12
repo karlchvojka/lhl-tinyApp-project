@@ -1,10 +1,18 @@
 <% include partials/_header %>
-  <h3>Create TinyURL</h3>
-  <form class="form-inline" action="/urls" method="POST">
-    <div class="form-group mb-2">
-      <label for="longURL">Enter a URL:</label>
-      <input class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em">
-      <button type="submit" class="btn btn-primary">Submit</button>
+<section>
+  <article class="container">
+    <div class="row">
+      <div class="col-12">
+        <h3>Create TinyURL</h3>
+        <form class="form-inline" action="/urls" method="POST">
+          <div class="form-group mb-2">
+            <label for="longURL">Enter a URL:</label>
+            <input class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
+      </div>
     </div>
-  </form>
+  </article>
+</section>
 <%- include partials/_footer %>
