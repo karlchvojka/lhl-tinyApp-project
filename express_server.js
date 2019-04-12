@@ -21,6 +21,10 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
 
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}`)
+})
+
 app.get('/', (req, res) => {
   if (req.session['user_id']) {
     res.redirect('/urls')
@@ -29,25 +33,13 @@ app.get('/', (req, res) => {
   }
 })
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`)
-})
-
-// Make the Database readable via a webpage.
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase)
-})
-
-app.get('/hello', (req, res) => {
-  res.send('<html><body>Hello <b>World</b></body></html>\n')
-})
-
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase, user: usersDatabase[req.session['user_id']] }
   if (templateVars.user) {
     res.render('urls_index', templateVars)
   } else {
-    res.redirect('/login')
+    // WORKS //
+    res.send('Please log in <a href="/login"> here</a>')
   }
 })
 
@@ -61,8 +53,12 @@ app.get('/register', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-  let templateVars = { urls: urlDatabase, user: usersDatabase[req.session['user_id']] }
-  res.render('login', templateVars)
+  if (!req.session['user_id']) {
+    let templateVars = { urls: urlDatabase, user: usersDatabase[req.session['user_id']] }
+    res.render('login', templateVars)
+  } else {
+    res.redirect('/urls')
+  }
 })
 
 app.get('/urls/new', (req, res) => {
@@ -70,15 +66,27 @@ app.get('/urls/new', (req, res) => {
   if (!req.session['user_id']) {
     res.redirect('/login')
   } else {
+    // Works //
     res.render('urls_new', templateVars)
   }
 })
 
 app.get('/urls/:shortURL', (req, res) => {
+  // IF USER IS SIGNED IN
+  if (!req.session['user_id'] || !usersDatabase[req.session['user_id']]) {
+    res.send('Please sign in <a href="/login">here</a>')
+    return
+  }
+  if (!urlDatabase[req.params.shortURL]) {
+    res.send('That url has not been shortened. Please add it and try again.')
+    return
+  }
+  if (usersDatabase[req.session['user_id']].id !== urlDatabase[req.params.shortURL].userID) {
+    res.send('Not you url! <a href="/urls">Choose another</a>')
+    return
+  }
   let shortURLRef = req.params.shortURL
-  console.log('short', shortURLRef)
-  console.log('params', urlDatabase)
-  let templateShowVars = { shortURL: shortURLRef, longURL: urlDatabase[shortURLRef].longURL, user: usersDatabase[req.session['user_id']] }
+  let templateShowVars = { shortURL: shortURLRef, longURL: urlDatabase[shortURLRef].longURL, user: usersDatabase[req.session['user_id']].id }
   res.render('urls_show', templateShowVars)
 })
 
@@ -94,22 +102,24 @@ app.post('/login', (req, res) => {
   let emailEntry = req.body.email
   let passwordEntry = req.body.password
   let keyEntry = lookupByEmail(emailEntry)
-  // const errorCall = (errorCode) => { res.sendStatus(errorCode) }
+
+  if (req.body.email === '' || req.body.password === '') {
+    res.send('You have not entered a username or password. Please try again.')
+  }
+
   if (keyEntry === undefined) {
-    // errorCall(403)
     res.send('Your user does not exist. Please try again.')
   } else if (keyEntry && bcrypt.compareSync(passwordEntry, usersDatabase[keyEntry]['password'])) {
     req.session['user_id'] = keyEntry
     res.redirect('/urls/')
   } else {
-    // errorCall(403)
-    res.send('Your Please try again.')
+    res.send('Your username and password dont match. Please try again.')
   }
 })
 
 app.post('/logout', (req, res) => {
   req.session = null
-  res.redirect('/urls')
+  res.redirect('/login')
 })
 
 app.post('/register', (req, res) => {
@@ -119,23 +129,31 @@ app.post('/register', (req, res) => {
   const passwordEntry = req.body['password']
   const hashedPassword = bcrypt.hashSync(passwordEntry, 10)
   var randomiD = generateRandomString()
-  const errorCall = (errorCode) => { res.sendStatus(errorCode) }
 
-  // IF either filed is emtpy return 400.
-  if (usernameEntry === '' || hashedPassword === '') {
-    errorCall(404)
+  if (usernameEntry === '' || passwordEntry === '') {
+    res.send('You have not entered a username or password. Please try again.')
+    return
   }
-  for (user in usersDatabase) {
+  for (let user in usersDatabase) {
     if (usersDatabase[user]['email'] === usernameEntry) {
-      return errorCall(400)
+      res.send('That user already exists. Please try again.')
     }
   }
-  // Else add info to database
   regVars[randomiD] = {}
   regVars[randomiD]['id'] = randomiD
   regVars[randomiD]['email'] = usernameEntry
   regVars[randomiD]['password'] = hashedPassword
-  res.redirect('/urls')
+
+  let emailEntry = req.body.email
+  let keyEntry = lookupByEmail(emailEntry)
+  if (keyEntry === undefined) {
+    res.send('Your user does not exist. Please try again.')
+  } else if (keyEntry && bcrypt.compareSync(passwordEntry, usersDatabase[keyEntry]['password'])) {
+    req.session['user_id'] = keyEntry
+    res.redirect('/urls/')
+  } else {
+    res.send('Your username and password dont match. Please try again.')
+  }
 })
 
 app.post('/urls/:shortURL/update', (req, res) => {
@@ -150,6 +168,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.redirect('/urls')
 })
 
+// ------- WORKS -----------//
 app.get('/u/:shortURL', (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     const longURL = urlDatabase[req.params.shortURL]['longURL']
@@ -158,6 +177,7 @@ app.get('/u/:shortURL', (req, res) => {
     res.send('That url has not been shortened with this service')
   }
 })
+// -------- END -----------//
 
 // Functions
 function generateRandomString () {
