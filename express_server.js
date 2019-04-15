@@ -13,17 +13,18 @@ var urlDatabase = require('./database')
 var usersDatabase = require('./users')
 
 app.use(bodyParser.urlencoded({ extended: true }))
+
+// Set EJS as the view engine for the app.
 app.set('view engine', 'ejs')
+
+// Set the cookie session, keys, and max age of said cookie.
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2'],
   maxAge: 24 * 60 * 60 * 1000
 }))
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`)
-})
-
+// GET declaration for the homepage.
 app.get('/', (req, res) => {
   if (req.session['user_id']) {
     res.redirect('/urls')
@@ -32,6 +33,7 @@ app.get('/', (req, res) => {
   }
 })
 
+// GET declaration for the /urls page
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase, user: usersDatabase[req.session['user_id']] }
   if (templateVars.user) {
@@ -41,6 +43,7 @@ app.get('/urls', (req, res) => {
   }
 })
 
+// GET declaration for the /register page
 app.get('/register', (req, res) => {
   if (!req.session['user_id']) {
     let templateVars = { urls: urlDatabase, user: usersDatabase[req.session['user_id']] }
@@ -50,6 +53,7 @@ app.get('/register', (req, res) => {
   }
 })
 
+// GET declaration for the /login page
 app.get('/login', (req, res) => {
   if (!req.session['user_id']) {
     let templateVars = { urls: urlDatabase, user: usersDatabase[req.session['user_id']] }
@@ -59,6 +63,7 @@ app.get('/login', (req, res) => {
   }
 })
 
+// GET declaration for the /new page
 app.get('/urls/new', (req, res) => {
   let templateVars = { user: usersDatabase[req.session['user_id']] }
   if (!req.session['user_id']) {
@@ -68,6 +73,7 @@ app.get('/urls/new', (req, res) => {
   }
 })
 
+// GET declaration for each individual short URL page.
 app.get('/urls/:shortURL', (req, res) => {
   if (!req.session['user_id'] || !usersDatabase[req.session['user_id']]) {
     res.send('Please sign in <a href="/login">here</a>')
@@ -86,6 +92,7 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateShowVars)
 })
 
+// POST Declaration for the endpoint /urls
 app.post('/urls', (req, res) => {
   var getShortURL = generateRandomString()
   urlDatabase[getShortURL] = {}
@@ -94,6 +101,7 @@ app.post('/urls', (req, res) => {
   res.redirect('/urls/' + getShortURL)
 })
 
+// POST Declaration for the endpoint /login
 app.post('/login', (req, res) => {
   let emailEntry = req.body.email
   let passwordEntry = req.body.password
@@ -113,11 +121,13 @@ app.post('/login', (req, res) => {
   }
 })
 
+// POST Declaration for the /logout endpoint.
 app.post('/logout', (req, res) => {
   req.session = null
   res.redirect('/login')
 })
 
+// POST Declaration for the /register endpoint.
 app.post('/register', (req, res) => {
   let regVars = usersDatabase
   const usernameEntry = req.body['email']
@@ -151,17 +161,20 @@ app.post('/register', (req, res) => {
   }
 })
 
+// POST Declaration for the /update endpoint found for each short URL after creation.
 app.post('/urls/:shortURL/update', (req, res) => {
   let shortURLRef = req.params.shortURL
   urlDatabase[shortURLRef].longURL = req.body.longURL
   res.redirect('/urls/')
 })
 
+// POST Declaration to handle deleting of a url.
 app.post('/urls/:shortURL/delete', (req, res) => {
   delete urlDatabase[req.params.shortURL]
   res.redirect('/urls')
 })
 
+// GET Declaration to handle incoming requests from the outside.
 app.get('/u/:shortURL', (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     const longURL = urlDatabase[req.params.shortURL]['longURL']
@@ -171,6 +184,11 @@ app.get('/u/:shortURL', (req, res) => {
   }
 })
 
+/* ---------------- */
+// Helper Functions.//
+/* ---------------- */
+
+// Helper function to generate strings of 6 characters to use as the 'short' URL
 function generateRandomString () {
   let finalStr = ''
   const possibleChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -184,6 +202,7 @@ function generateRandomString () {
   return finalStr
 }
 
+// Helper function to identify current users.
 function lookupByEmail (inputUserEntry) {
   var responseID = ''
   Object.keys(usersDatabase).forEach(function (key) {
@@ -195,3 +214,8 @@ function lookupByEmail (inputUserEntry) {
   })
   return responseID
 }
+
+// Reflect back the port on the server side.
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}`)
+})
