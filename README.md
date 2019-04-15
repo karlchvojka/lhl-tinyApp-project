@@ -26,12 +26,11 @@ npm start
 ```
 
 ## Package dependencies
-- [body parser][https://www.npmjs.com/package/body-parser]
-- [Cookie parser][https://www.npmjs.com/package/cookie-parser]
-- [ejs][https://www.npmjs.com/package/ejs]
-- [express][https://www.npmjs.com/package/express]
-- [nodemon][https://www.npmjs.com/package/nodemon]
-
+- [body parser](https://www.npmjs.com/package/body-parser)
+- [Cookie parser](https://www.npmjs.com/package/cookie-parser)
+- [ejs](https://www.npmjs.com/package/ejs)
+- [express](https://www.npmjs.com/package/express)
+- [nodemon](https://www.npmjs.com/package/nodemon)
 
 ## Changelog
 ### Apr 11, 2019
