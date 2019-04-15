@@ -38,6 +38,9 @@ npm start
 - Did the beginning work on the Project
 - Installed bcrypt
 
+### Apr 15, 2019
+- Cleaned up some if checks and added comments.
+
 ## Authors
 - Karl Chvojka
 
